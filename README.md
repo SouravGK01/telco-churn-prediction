@@ -1,4 +1,4 @@
-Telco Customer Churn Prediction
+Telco Customer Churn Prediction ( https://colab.research.google.com/drive/1ERj-4NSA66txmC_aFwOuYzZCvzlsx9Bc?usp=sharing)
 
 Welcome!   
 This project is all about predicting whether a customer is likely to **churn** (leave a telecom company) based on their account details, usage, and services.
