@@ -3,15 +3,17 @@ import pandas as pd
 import numpy as np
 import joblib
 
+# Set page config
 st.set_page_config(page_title="📞 Churn Predictor", layout="centered")
 st.title("📞 Telecom Customer Churn Predictor")
-st.markdown("Upload customer CSV and predict if they will churn.")
+st.markdown("Upload customer CSV and predict if they are likely to churn.")
 
 # Load model, scaler and feature list
 model = joblib.load("churn_model.pkl")
 scaler = joblib.load("scaler.pkl")
-feature_list = joblib.load("features.pkl")  # List of columns used during training
+features = joblib.load("features.pkl")  # This must match training features
 
+# File upload
 uploaded_file = st.file_uploader("📤 Upload a CSV file", type=["csv"])
 
 if uploaded_file:
@@ -20,39 +22,38 @@ if uploaded_file:
         st.subheader("📄 Raw Input Data")
         st.dataframe(df.head())
 
-        # === Minimal Preprocessing like training ===
+        # Preprocessing (match training)
         df.replace(" ", np.nan, inplace=True)
         df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
         df.dropna(inplace=True)
-
-        # Drop customerID if it exists
         df.drop("customerID", axis=1, inplace=True, errors="ignore")
 
-        # Encode binaries
+        # Encode binary columns
         binary_cols = ["Partner", "Dependents", "PhoneService", "PaperlessBilling"]
         for col in binary_cols:
             if col in df.columns:
                 df[col] = df[col].map({"Yes": 1, "No": 0})
+
         if "gender" in df.columns:
             df["gender"] = df["gender"].map({"Male": 1, "Female": 0})
 
-        # One-hot encode all categoricals
+        # One-hot encode
         df_encoded = pd.get_dummies(df)
 
-        # Reindex to match model's training features
-        df_encoded = df_encoded.reindex(columns=feature_list, fill_value=0)
+        # Align with training features
+        df_encoded = df_encoded.reindex(columns=features, fill_value=0)
 
         # Scale
         df_scaled = scaler.transform(df_encoded)
 
         # Predict
-        preds = model.predict(df_scaled)
-        probs = model.predict_proba(df_scaled)[:, 1]
+        predictions = model.predict(df_scaled)
+        probabilities = model.predict_proba(df_scaled)[:, 1]
 
-        # Display
+        # Display results
         result_df = pd.DataFrame({
-            "Prediction": ["Churn" if p == 1 else "No Churn" for p in preds],
-            "Churn Probability (%)": (probs * 100).round(2)
+            "Prediction": ["Churn" if p == 1 else "No Churn" for p in predictions],
+            "Churn Probability (%)": (probabilities * 100).round(2)
         })
 
         st.subheader("📊 Prediction Results")
