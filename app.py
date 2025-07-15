@@ -51,10 +51,20 @@ if uploaded_file:
         probabilities = model.predict_proba(df_scaled)[:, 1]
 
         # Display results
+        
+        # If original churn column exists
+        if "Churn" in df.columns:
+            actuals = df["Churn"].map({1: "Churn", 0: "No Churn", "Yes": "Churn", "No": "No Churn"})
+        else:
+            actuals = ["Unknown"] * len(predictions)
+
         result_df = pd.DataFrame({
+            "Customer #": df.index + 1,
+            "Actual Churn (if given)": actuals,
             "Prediction": ["Churn" if p == 1 else "No Churn" for p in predictions],
             "Churn Probability (%)": (probabilities * 100).round(2)
-        })
+            })
+
 
         st.subheader("📊 Prediction Results")
         st.dataframe(result_df)
