@@ -4,7 +4,7 @@ import joblib
 
 st.title("📱 Telecom Churn Predictor")
 
-model = joblib.load("rf_churn_model.pkl")
+model = joblib.load("churn_model.pkl")
 scaler = joblib.load("scaler.pkl")
 
 uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
