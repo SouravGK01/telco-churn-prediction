@@ -137,5 +137,5 @@ plt.show()
 
 # 8. Save Model
 
-joblib.dump(best_model, "rf_churn_model.pkl")
+joblib.dump(best_model, "churn_model.pkl")
 joblib.dump(scaler, "scaler.pkl")
